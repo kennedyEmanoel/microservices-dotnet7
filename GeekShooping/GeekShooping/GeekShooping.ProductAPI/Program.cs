@@ -1,5 +1,7 @@
-using RestWithASPNET.Services;
-using RestWithASPNET.Services.Implementations;
+using GeekShooping.ProductAPI.Model.Context;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using MySqlConnector;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,8 +12,15 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//Dependency Injection
-builder.Services.AddScoped<IPersonService, PersonServiceImplementation>();
+//connect 
+var connectionStringMysql = builder.Configuration.GetConnectionString("ConnectionMysql");
+builder.Services.AddDbContext<MySQLContext>(options => options.UseMySql(
+    connectionStringMysql, 
+    new MySqlServerVersion(new Version(8, 0, 34))));
+
+
+
+
 
 var app = builder.Build();
 
@@ -21,8 +30,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
